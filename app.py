@@ -46,35 +46,133 @@ def go_to(page: str):
 
 
 # ---------------------------------------------------------------------------
-# Global styling
+# Global styling — light theme, modern cards & buttons
 # ---------------------------------------------------------------------------
 st.markdown(
     """
     <style>
+    @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Inter:wght@400;500;600&display=swap');
+
+    :root {
+        --ink: #1E293B;
+        --muted: #64748B;
+        --border: #E2E8F0;
+        --surface: #FFFFFF;
+        --canvas: #F8FAFC;
+        --accent: #4F46E5;
+        --accent-2: #0EA5E9;
+        --accent-soft: #EEF2FF;
+    }
+
+    html, body, [class*="css"] { font-family: 'Inter', -apple-system, sans-serif; }
+
+    .stApp { background-color: var(--canvas); }
+
     .main-title {
-        font-size: 2.4rem;
+        font-family: 'Manrope', sans-serif;
+        font-size: 2.5rem;
         font-weight: 800;
-        color: #2E3440;
+        color: var(--ink);
         margin-bottom: 0;
+        letter-spacing: -0.02em;
     }
     .subtitle {
         font-size: 1.05rem;
-        color: #4C566A;
-        margin-top: 0.2rem;
-        margin-bottom: 1.5rem;
+        color: var(--muted);
+        margin-top: 0.35rem;
+        margin-bottom: 1.75rem;
     }
+
+    /* Metric tiles */
     div[data-testid="stMetric"] {
-        background-color: #ECEFF4;
-        border-radius: 10px;
-        padding: 12px 16px;
-    }
-    .platform-card {
+        background-color: var(--surface);
+        border: 1px solid var(--border);
         border-radius: 14px;
-        padding: 24px;
-        text-align: center;
-        border: 1px solid #E5E9F0;
-        background: linear-gradient(180deg, #ffffff 0%, #F7F9FC 100%);
+        padding: 14px 18px;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
     }
+    div[data-testid="stMetricLabel"] { color: var(--muted); }
+    div[data-testid="stMetricValue"] { color: var(--ink); font-weight: 700; }
+
+    /* Platform cards */
+    .platform-card {
+        position: relative;
+        border-radius: 18px;
+        padding: 26px 22px 20px 22px;
+        text-align: center;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+        transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+    .platform-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 14px 28px rgba(79, 70, 229, 0.12);
+        border-color: #C7D2FE;
+    }
+    .platform-card .icon-badge {
+        width: 56px;
+        height: 56px;
+        margin: 0 auto 10px auto;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+        background: var(--accent-soft);
+    }
+    .platform-card h3 {
+        font-family: 'Manrope', sans-serif;
+        font-size: 1.15rem;
+        color: var(--ink);
+        margin: 0 0 12px 0;
+    }
+    .platform-card .card-note {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin-top: 4px;
+    }
+
+    /* Buttons — pill style with a subtle indigo gradient */
+    div[data-testid="stButton"] button,
+    div[data-testid="stFormSubmitButton"] button,
+    div[data-testid="stDownloadButton"] button {
+        border-radius: 999px;
+        border: 1px solid transparent;
+        font-weight: 600;
+        padding: 0.55rem 1.4rem;
+        transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+    }
+    div[data-testid="stButton"] button[kind="primary"],
+    div[data-testid="stFormSubmitButton"] button[kind="primary"] {
+        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+        color: #FFFFFF;
+        box-shadow: 0 6px 16px rgba(79, 70, 229, 0.25);
+    }
+    div[data-testid="stButton"] button[kind="primary"]:hover,
+    div[data-testid="stFormSubmitButton"] button[kind="primary"]:hover {
+        filter: brightness(1.06);
+        transform: translateY(-1px);
+        box-shadow: 0 10px 20px rgba(79, 70, 229, 0.32);
+    }
+    div[data-testid="stButton"] button[kind="secondary"],
+    div[data-testid="stDownloadButton"] button {
+        background: var(--surface);
+        color: var(--accent);
+        border: 1.5px solid #C7D2FE;
+    }
+    div[data-testid="stButton"] button[kind="secondary"]:hover,
+    div[data-testid="stDownloadButton"] button:hover {
+        background: var(--accent-soft);
+        border-color: var(--accent);
+        transform: translateY(-1px);
+    }
+
+    /* Section divider spacing */
+    hr { margin: 1.6rem 0; border-color: var(--border); }
+
+    /* Dataframes */
+    div[data-testid="stDataFrame"] { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
     </style>
     """,
     unsafe_allow_html=True,
@@ -120,49 +218,52 @@ def render_home():
         c1, c2, c3 = st.columns(3)
 
         with c1:
-            st.markdown('<div class="platform-card">', unsafe_allow_html=True)
-            st.markdown("### 🐙 GitHub")
+            st.markdown(
+                '<div class="platform-card"><div class="icon-badge">🐙</div><h3>GitHub</h3></div>',
+                unsafe_allow_html=True,
+            )
             data = st.session_state.github_data
             if data and data.get("available"):
                 st.metric("Public Repos", data["profile"].get("public_repos", 0))
-                if st.button("Open GitHub Dashboard", key="open_github", use_container_width=True):
+                if st.button("Open GitHub Dashboard", key="open_github", use_container_width=True, type="primary"):
                     go_to("github")
                     st.rerun()
             elif data:
                 st.info(data.get("error") or "No data available.")
             else:
                 st.caption("No username provided.")
-            st.markdown("</div>", unsafe_allow_html=True)
 
         with c2:
-            st.markdown('<div class="platform-card">', unsafe_allow_html=True)
-            st.markdown("### 💻 LeetCode")
+            st.markdown(
+                '<div class="platform-card"><div class="icon-badge">💻</div><h3>LeetCode</h3></div>',
+                unsafe_allow_html=True,
+            )
             data = st.session_state.leetcode_data
             if data and data.get("available"):
                 st.metric("Problems Solved", data["profile"].get("total_solved", 0))
-                if st.button("Open LeetCode Dashboard", key="open_leetcode", use_container_width=True):
+                if st.button("Open LeetCode Dashboard", key="open_leetcode", use_container_width=True, type="primary"):
                     go_to("leetcode")
                     st.rerun()
             elif data:
                 st.info(data.get("error") or "No data available.")
             else:
                 st.caption("No username provided.")
-            st.markdown("</div>", unsafe_allow_html=True)
 
         with c3:
-            st.markdown('<div class="platform-card">', unsafe_allow_html=True)
-            st.markdown("### 📈 Kaggle")
+            st.markdown(
+                '<div class="platform-card"><div class="icon-badge">📈</div><h3>Kaggle</h3></div>',
+                unsafe_allow_html=True,
+            )
             data = st.session_state.kaggle_data
             if data and data.get("available"):
                 st.metric("Notebooks Published", data["profile"].get("notebooks_count", 0))
-                if st.button("Open Kaggle Dashboard", key="open_kaggle", use_container_width=True):
+                if st.button("Open Kaggle Dashboard", key="open_kaggle", use_container_width=True, type="primary"):
                     go_to("kaggle")
                     st.rerun()
             elif data:
                 st.info(data.get("error") or "No data available.")
             else:
                 st.caption("No username provided.")
-            st.markdown("</div>", unsafe_allow_html=True)
 
         st.divider()
         render_report_section()

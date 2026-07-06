@@ -23,9 +23,9 @@ from reportlab.platypus import (
     PageBreak,
 )
 
-PRIMARY_COLOR = colors.HexColor("#2E3440")
-ACCENT_COLOR = colors.HexColor("#5E81AC")
-LIGHT_BG = colors.HexColor("#ECEFF4")
+PRIMARY_COLOR = colors.HexColor("#1E293B")
+ACCENT_COLOR = colors.HexColor("#4F46E5")
+LIGHT_BG = colors.HexColor("#EEF2FF")
 
 
 def _styles():
